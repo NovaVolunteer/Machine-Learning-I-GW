@@ -1,0 +1,171 @@
+---
+title: "Wine Quality"
+author: "Brian Wright"
+date: "March 30, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("C:/Users/bwright/Documents/R")
+library(glmnet)
+library(ISLR)
+library(plotmo)
+library(gradDescent)
+library(caret)
+library(dplyr)
+```
+
+We are going to use white wine quality to walk through a example of gradient regression and ridge regression. Our goal is to develop a model to predict the quality of white wine. 
+```{r}
+white <- read.csv('winequality-white.csv')
+head(white)
+str(white)
+View(white)
+#what's wrong with using quality as a target vector?
+
+cor(white)
+
+#So let's start with a normal regression model. 
+white_stand <- data.frame(scale(white)) #We are going to need to standardize our inputs for penalized regression so let's go ahead and do that work the OLS regression for ease of comparison. 
+
+ols_white <- lm(alcohol~., data = white_stand)
+summary(ols_white) - #Ok so what does this tell us? 
+
+ols_white_coef <- data.frame(ols_white$coefficients)
+View(ols_white_coef)
+ 
+ols_white_pred <- predict(ols_white, white_stand)
+head(ols_white_pred)
+head(white_stand$alcohol)
+```
+
+Ok now let's do regression with a gradiant 
+```{r}
+#We should really split the data into test and train at this point, we are going to use the caret package but I'll show a manual way later as well
+
+#Here we are creating a index to use to split the data
+gd_trainIndex <- createDataPartition(white_stand$alcohol, p=.66, list=FALSE,times = 1)
+
+#Here we are using the index
+gd_white_tr <- white_stand[gd_trainIndex, ]
+gd_white_te <- white_stand[-gd_trainIndex, ]
+dim(gd_white_tr)
+dim(gd_white_te)
+
+gd_white_tr <- gd_white_tr%>%select(-alcohol,everything())
+str(gd_white_tr)
+gd_white_te <- gd_white_te%>%select(-alcohol,everything())
+str(gd_white_te)
+
+GD_White <- gradDescentR.learn(gd_white_tr,learningMethod = "GD", control = list(.001,100), seed = 100)
+
+GD_White$model
+pred_GD_White <- predict(GD_White, gd_white_te)
+head(pred_GD_White)
+pred_GD_whitev1 <- pred_GD_White$V1
+
+
+
+```
+
+
+
+```{r}
+#First let's split our data in train and test, using say 2/3 train, 1/3 test and target/predictor variables
+
+n_obs = dim(white_stand)[1]
+n_obs
+prop_split = 0.66
+train_index = sample(1:n_obs, round(n_obs * prop_split))
+predictors <- white_stand[c(1:10,12)]
+head(predictors)
+target <- white_stand$alcohol
+head(target)
+#Ridge Regression Requires a Matrix vice a Dataframe
+predictors <- model.matrix(fixed.acidity~., predictors)
+str(predictors)
+pred_tr = predictors[train_index,]
+pred_te = predictors[-train_index,]
+target_tr = target[train_index]
+target_te = target[-train_index]
+
+
+#Ok let's build the model and see what happens
+ridge.white <- glmnet(pred_te,target_te, alpha = 0, nlambda = 100, lambda.min.ratio = .0001)
+
+
+#Let's look with the least amount of penality 
+white_coefs100 <- data.frame(coef(ridge.white)[,100])
+View(white_coefs100)
+
+#Now let's look at the highest penality 
+white_coefs1<- data.frame(coef(ridge.white)[,1])
+View(white_coefs1)
+
+white_lambda <- data.frame(ridge.white$lambda)
+View(white_lambda)
+
+#We can also take a look at a more fine tuned graphical output 
+
+plot_glmnet(ridge.white,xvar="lambda",label=5)
+plot_glmnet(ridge.white,label=5)
+
+
+#Ok but this doesn't use cross validation to train the penality, so let's see an example using cv.glmnet 
+set.seed(100)
+cv.white.ridge <- cv.glmnet(predictors, target, alpha=0, nlambda=100, lambda.min.ratio=.0001)
+#Let's take a look and see if we can see the minumum
+plot(cv.white.ridge)
+
+#Let's take a look under the hood, here we have the lambda outputs, the mean cross validated error and the estimate of the standard error of the cvm
+cv.white.ridge.output <- data.frame(cv.white.ridge$lambda,cv.white.ridge$cvm,cv.white.ridge$cvsd)
+
+View(cv.white.ridge.output)
+
+#This will provide our best lambda output
+best.penality <- cv.white.ridge$lambda.min
+best.penality
+
+
+white.best.coef <- data.frame(predict(ridge.white, s=best.penality, type="coefficients")[1:12, ])
+View(white.best.coef)
+cv.white.ridge$lambda
+
+
+#Finally let's compare our models using RMSE
+#predict with OLS, GD and Ridge and see what happens  
+
+y_hat_ols <- predict(ols_white, white_stand)
+RMSE_OLS <- sqrt(mean((white$alcohol-y_hat_ols)^2))
+RMSE_OLS
+
+
+y_hat_gd <- pred_GD_whitev1
+RSME_gd <- sqrt(mean((gd_white_te-y_hat_gd)^2))
+RSME_gd
+
+y_hat_ridge <- predict(cv.white.ridge, pred_te)
+RMSE_Ridge <- sqrt(mean((target_te-y_hat_ridge)^2))
+RMSE_Ridge
+
+#Also a RSME function called...RSME
+
+```
+
+Ok no let's do it as a classifier 
+```{r}
+library(forcats)
+library(car)
+table(white$quality)
+quantile(as.numeric(white$quality))
+boxplot(as.numeric(white$quality))
+bi_quality <- cut(as.numeric(white$quality), breaks = c(0,7,9),labels = c(0,1))
+head(bi_quality)
+table(bi_quality)
+
+
+
+```
+
+
