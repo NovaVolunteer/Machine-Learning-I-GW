@@ -1,0 +1,100 @@
+INSTRUCTOR
+Name: Brian Wright
+Term: Spring 2018
+Campus Address: N/A
+E-mail: bwright6@email.gwu.edu
+Office hours: By appointment
+
+COURSE DESCRIPTION:
+
+This course is an introduction to Machine Learning and its core models and algorithms for students in the Data Science Program. The objective of the course is to provide students an overview of machine learning techniques to explore, analyze, and leverage data.  This course cover; supervised, unsupervised, and common techniques in data processing. Students will be familiarized with broad machine learning and statistical pattern recognition topics, including: neural network training, classification, regression, support vector machines. Students will use Python and R to complete the projects through the course.
+
+LEARNING OBJECTIVES:
+
+Students will be able to:
+1.	Understand machine learning algorithms and concepts.
+2.	Demonstrate Machine Learning technics using Python and R.
+3.	Train, test and validate neural network models for machine learning concepts.
+4.	Understand the core concept of supervise, and unsupervised learning.
+5.	Apply the machine learning concepts to practical problems.
+
+RESOURCES:
+
+The following book is required for the course:
+A-Sebastian Raschk, Python Machine Learning, 2015
+B-Neural Network Design (2nd Ed) - Author: Hagan, Demuth,Beale, De Jesus- Free Ebook (Web Link)
+C- Machine Learning in Python Essential Techniques for Predictive Analysis - Author: Michael Bowles
+
+
+
+The following books are recommended as optional reading:
+
+D-Tom Mitchell, Machine Learning. McGraw-Hill, 1997.
+E-Richard Sutton and Andrew Barto, Reinforcement Learning: An introduction. MIT Press, 1998
+F- Richard Duda, Peter Hart and David Stork, Pattern Classification, 2nd ed. John Wiley & Sons, 2001.
+
+G- Data Science From Scratch First Principles with Python -Author: Joel Grus
+
+
+SOFTWARE:
+
+Python and R will be required for homework assignments and the projects.
+
+
+TENTATIVE COURSE SCHEDULE (SUBJECT TO CHANGE):
+
+Week	Topic	Date
+1	Overview of Machine Learning	
+2	Math Review (Probabily, Linear Algebra, Mulitvariate Calculus)
+3	Data Preparation, normalization, missing data imputation, visualization 
+4	Neural Networks	- 3 sessions
+5	Neural Networks 	
+6	Neural Networks	
+7	Decision Tree and Random Forrest 
+8	Mid-term Project Presentations	
+9	Probability/Regression Review 	
+10	Ridge Introduction (Gradient/Cross Validation)	
+11	Penalized Regression Ridge 
+12	Penalized Regression Lasso/Elastic Net 
+13	Project Presentations
+14	Final Project Report Due/Make Up – Course Review	5/3/17
+
+
+PREREQUIZETS: 
+•	Introduction to Statistic 
+•	Multivariate Calculus 
+•	Linear Algebra
+
+GRADING AND EXAMINATION POLICY:
+
+Class attendance – 10%
+In-class participation – 15%
+Mid-term Project – 20%
+Comprehensive Final Project with report - 55%
+
+
+SECURITY:
+
+In the case of an emergency, if at all possible, the class should shelter in place. If the building that the class is in is affected, follow the evacuation procedures for the building. After evacuation, seek shelter at a predetermined rendezvous location.
+
+DISABILITY SUPPORT SERVICES (DSS):
+
+Any student who may need an accommodation based on the potential impact of a disability should contact the Disability Support Services office at 202-994-8250 in the Marvin Center, Suite 242, to establish eligibility and to coordinate reasonable accommodations.
+
+The University Counseling Center (UCC Phone: 202-994-5300) offers 24/7 assistance and referral to address students' personal, social, career, and study skills problems (Web Link). Services for students include:
+-	crisis and emergency mental health consultations
+-	confidential assessment, counseling services (individual and small group), and referrals
+
+
+ACADEMIC INTEGRITY
+
+The code of academic integrity applies to all courses in the George Washington School ("Academic dishonesty is defined as cheating of any kind, including misrepresenting one's own work, taking credit for the work of others without crediting them and without appropriate authorization, and the fabrication of information."). In the spirit of the code, a student's word is a declaration of good faith acceptable as truth in all academic matters. Cheating and attempted cheating, plagiarism, lying, and stealing of academic work and related materials constitute Honor Code violations. These will not be tolerated. Please become familiar with the code.  All students are expected to maintain the highest level of academic integrity throughout the course of the semester.  Please note that acts of academic dishonesty during the course will be prosecuted and harsh penalties may be sought for such acts.  Students are responsible for knowing what acts constitute academic dishonesty.  The code may be found at sea: http://www.gwu.edu/~ntegrity/code.html
+
+UNIVERSITY POLICIES:
+
+Students should notify faculty during the first week of the semester of their intention to be absent from class on their day(s) of religious observance.  Faculty should extend to these students the courtesy of absence without penalty on such occasions, including permission to make up examinations.  Faculty who intend to observe a religious holiday should arrange at the beginning of the semester to reschedule missed classes or to make other provisions for their course-related activities.
+
+
+EMAIL ETIQUETTE
+
+In the age of technology, when most forms of communication are electronic, it is important to adopt a proper etiquette to communicate with one another. It is asked that students use salutation when sending emails to their instructors and also make sure to SIGN their name and include their class/section at the end of the email. The instructor reserves the right NOT to reply to emails that are not properly addressed or do not have a signature. Students should also use their GWU email for any correspondence with the instructors. Students are required to check their emails daily and especially the morning before class.
