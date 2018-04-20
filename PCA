@@ -1,1 +1,184 @@
 
+```{r basicfcn, include=F}
+# can add quietly=T option to the require() function
+loadPkg = function(x) { if (!require(x,character.only=T, quietly =T)) { install.packages(x,dep=T,repos="http://cran.us.r-project.org"); if(!require(x,character.only=T)) stop("Package not found") } }
+```
+
+
+Simple example of subset data we've used previously, just indicate where we want to target using the subset feature
+```{r}
+#plot first to take a look at the data
+str(cars)
+plot(cars$speed, cars$dist, main = "Cars Plot", xlab="Speed", ylab="Distance")
+#can add a line as well
+scatter.smooth(cars)
+#Look at some initial desc stats
+loadPkg("pastecs")
+stat.desc(cars)
+#Looks like we have a linear line
+# Go ahead a develop our model
+# Does Speed effect stoping distance?
+x <- lm(dist~speed, data = cars)
+head(cars)
+summary(x)
+speed.s <- scale(cars$speed, center = TRUE, scale = FALSE)
+#Here we are focusing on cars with speed greater than 15mph
+x1 <- lm(dist~speed,data = subset(cars,speed>15))
+summary(x1)
+```
+
+However once we get up to a significant number of variables and we want to know which most explain the variance in our dependent variable. 
+```{r}
+loadPkg("leaps")
+loadPkg("ISLR")
+#This is essentially best fit 
+reg.best <- regsubsets(Salary~., data = Hitters, nvmax = 19)  # leaps, regsubsets: Model selection by exhaustive search, forward or backward stepwise, or sequential replacement
+#The plot will show the Adjust R^2 when using the variables across the bottom
+plot(reg.best, scale = "adjr2", main = "Adjusted R^2")
+# In the "leaps" package, we can use scale=c("bic","Cp","adjr2","r2")
+plot(reg.best, scale = "bic", main = "BIC")
+plot(reg.best, scale = "Cp", main = "Cp")
+summary(reg.best)
+```
+```{r}
+#We can also go backward and see if our results are any different
+reg.back <- regsubsets(Salary~., data = Hitters, method = "backward", nvmax = 6)
+#The plot will show the Adjust R^2 when using the variables across the bottom
+plot(reg.back, scale = "adjr2", main = "Adjusted R^2")
+plot(reg.back, scale = "bic", main = "BIC")
+plot(reg.back, scale = "Cp", main = "Cp")
+# In the "leaps" package, we can use scale=c("bic","Cp","adjr2","r2")
+summary(reg.back)
+#```
+#```{r}
+#We can also be forward selection
+reg.forward <- regsubsets(Salary~., data = Hitters, nvmax = 7, nbest = 1, method = "forward")
+summary(reg.forward)
+```
+```{r}
+regnonlin.best <- regsubsets(Salary~(AtBat+Hits+Walks+CAtBat+CRuns+CRBI+CWalks)^2, data = Hitters, nvmax = 19)  # leaps, regsubsets: Model selection by exhaustive search, forward or backward stepwise, or sequential replacement
+#The plot will show the Adjust R^2 when using the variables across the bottom
+plot(regnonlin.best, scale = "adjr2", main = "Adjusted R^2")
+# In the "leaps" package, we can use scale=c("bic","Cp","adjr2","r2")
+plot(regnonlin.best, scale = "bic", main = "BIC")
+plot(regnonlin.best, scale = "Cp", main = "Cp")
+summary(regnonlin.best)
+#```
+#```{r}
+#We can also go backward and see if our results are any different
+regnonlin.back <- regsubsets(Salary~(AtBat+Hits+Walks+CAtBat+CRuns+CRBI+CWalks)^2, data = Hitters, method = "backward", nvmax = 12)
+#The plot will show the Adjust R^2 when using the variables across the bottom
+plot(regnonlin.back, scale = "adjr2", main = "Adjusted R^2")
+plot(regnonlin.back, scale = "bic", main = "BIC")
+plot(regnonlin.back, scale = "Cp", main = "Cp")
+# In the "leaps" package, we can use scale=c("bic","Cp","adjr2","r2")
+summary(regnonlin.back)
+#```
+#```{r}
+#We can also be forward selection
+regnonlin.forward <- regsubsets(Salary~(AtBat+Hits+Walks+CAtBat+CRuns+CRBI+CWalks)^2, data = Hitters, nvmax = 7, nbest = 1, method = "forward")
+summary(regnonlin.forward)
+```
+
+```{r}
+#Maybe we try with even less variables 
+plot(reg.forward, scale = "adjr2", main = "Adjusted R^2")
+reg.forward
+```
+```{r}
+#Lastly we can do the hybrid approach
+reg.seqrep <- regsubsets(Salary~., data = Hitters, nvmax = 9, nbest = 1 , method = "seqrep")
+plot(reg.seqrep, scale = "adjr2", main = "Adjusted R^2")
+```
+```{r}
+#Here we want the hieghest Adjusted R^2 which looks to be .5, then looking across the .5 row wherever we see a black box is a recommended variable to use. 
+#Looks like pretty much the same variables, we can also do Cp as discussed in the slides
+plot(reg.seqrep, scale = "Cp", main = "Cp")  # scale can be "adjr2, Cp, bic" etc (but aic not supported)
+#Here it looks like we are again selecting pretty much the same variables, by using the lowest Cp 
+summary(reg.seqrep)
+```
+
+
+When we start down the road to PCA or other variable reduction techniques it is many times easier to normalize the data first. We've seen how to do this many times using the scale function.  
+```{r}
+str(USArrests)
+#We are going to use a example from the Intro to Statistical Learning Lab which uses USArrets data. 
+#Below creates a character vector from the first column in the data.frame
+states <- row.names(USArrests)
+#We now want to glance at our data, to try to understand the differences between the variables
+apply(USArrests , 2, mean)
+#We can see that that the average between the variables is quite high 
+apply(USArrests , 2, var)
+#As is the variance which means we need to standardize our data before moving forward with PCA, we can do this inside the prcomp() function used for conducting PCA analysis
+#By default the data is centered or has a mean of zero, selecting scale true also gives us a standard deviation of 1, by dividing the inputs by the columns sd (zscores)
+pr.out =prcomp(USArrests , scale =TRUE)
+#Before looking at the output let's glance at the "loading" vector for the PCA components 
+pr.out$rotation
+#These essential serve as plot points for the how the data loaded during the PCA calcluation #We can see this by plotting the first two outputs.
+biplot(pr.out,scale=0)
+#We can flip the view of the plot to be slightly more intuitive, like so...
+pr.out$rotation=-pr.out$rotation
+pr.out$x=-pr.out$x
+biplot(pr.out, scale =0)
+#We should now look at our summary output and do some plotting 
+summary(pr.out)
+#Ok so we know 3 compenonts compose 95% of the variance so now let's look at the graph again using the comparison of PC2 and PC3 and plot the cumilation of variance using the sd
+pr.var <- (pr.out$sdev^2)
+pve <- pr.var/sum(pr.var)
+pve
+plot(cumsum(pve), xlab="Principal Component", ylab ="Cumulative Proportion of Variance Explained",ylim=c(0,1),type="b")
+biplot(pr.out,2:3, scale =0)
+#We can also use ggplot to vis the output
+library(devtools)
+install_github("ggbiplot", "vqv")
+library(ggbiplot)
+g <- ggbiplot(pr.out,2:3, obs.scale = 1, var.scale = 1, ellipse = TRUE,circle = TRUE)
+print(g)
+
+
+```
+We can also use PCA more directly for regression using the PLS Package
+```{r}
+library(pls)
+library(mice)
+library(ISLR)
+#Again we want to scale our data and "CV" stands for cross validation, which is defaulted to RMSE, using Hitters Data Set in the ISLR package 
+pcr.fit=pcr(Salary~.,data=Hitters,scale=TRUE,validation ="CV")
+head(Hitters)
+summary(pcr.fit)
+#Check and see where are mean square error prediction is the lowest
+validationplot(pcr.fit ,val.type="MSEP")
+#Have to create training data
+str(Hitters)
+trainhitters <- Hitters[1:222, ]
+y_test <- Hitters[223:322, 2]
+testhitters <- Hitters[223:322,-2]
+pcr.fit <- pcr(Hits~. ,data=trainhitters,scale=TRUE,validation="CV")
+validationplot(pcr.fit,val.type="MSEP")
+#We can also use R^2
+validationplot(pcr.fit,val.type="R2")
+
+summary(pcr.fit)
+pcr_pred <- predict(pcr.fit, testhitters, ncomp = 9)
+df_predict <- data.frame(pcr_pred,y_test)
+#We see that we've got some missing data so we will conduct some imputation prior to constructing the MSE
+df_predict1 <- mice(df_predict,m=5,maxit = 50, method = "pmm")
+
+#Mice package provides a useful tool for conducting imputation methods, we will use the predictive mean method to replace the missing values
+df_predict <- complete(df_predict1,1)
+head(df_predict)
+#The complete function in the mice package pushes the imputate values back into our dataset
+summary(df_predict)
+Hit_MSE <- mean((df_predict$Hits.9.comps-df_predict$y_test)^2)
+Hit_RMSE <- sqrt(Hit_MSE)
+Hit_RMSE
+#We can also use the subset argument inside the function 
+pcr.fit1 <- pcr(Salary~. ,data=Hitters, subset=1:222,scale=TRUE,validation="CV")
+validationplot(pcr.fit1,val.type="MSEP")
+#We can also do R^2
+validationplot(pcr.fit1,val.type="R2")
+summary(pcr.fit1)
+```
+
+
+
